@@ -1,43 +1,33 @@
-// import "dotenv/config";
-// import app from "./app.js";
-// import { connectDB } from "./config/db.js";
-
-// const PORT = process.env.PORT || 3000;
-// const MONGODB_URI = process.env.MONGODB_URI;
-
-// (async () => {
-//      try {
-//           await connectDB(MONGODB_URI);
-//           app.listen(PORT, () => {
-//                console.log(`[server] Rodando em http://localhost:${PORT}`);
-//           });
-//      } catch (err) {
-//           console.error("[server] Falha ao iniciar:", err);
-//           process.exit(1);
-//      }
-// })();
-
+// src/server.js
 import "dotenv/config";
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
 import User from "./models/User.js";
+import logger from "./utils/logger.js"; // <-- import do logger
 
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
+/**
+ * Inicialização do servidor
+ * Fluxo:
+ * 1. Conecta ao MongoDB
+ * 2. Conta usuários para teste
+ * 3. Sobe servidor Express
+ */
 (async () => {
      try {
           await connectDB(MONGODB_URI);
 
-          // Teste simples com User
+          // Loga quantos usuários existem no banco
           const usersCount = await User.countDocuments();
-          console.log(`[db] Usuários existentes: ${usersCount}`);
+          logger.info(`[db] Usuários existentes: ${usersCount}`);
 
           app.listen(PORT, () => {
-               console.log(`[server] Rodando em http://localhost:${PORT}`);
+               logger.info(`[server] Rodando em http://localhost:${PORT}`);
           });
      } catch (err) {
-          console.error("[server] Falha ao iniciar:", err);
+          logger.error(`[server] Falha ao iniciar: ${err.message}`);
           process.exit(1);
      }
 })();
