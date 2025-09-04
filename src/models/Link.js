@@ -7,17 +7,29 @@ const linkSchema = new mongoose.Schema(
                required: true,
                unique: true,
                minlength: 4,
-               maxlength: 10
+               maxlength: 10,
           },
           originalUrl: {
                type: String,
-               required: true
+               required: true,
           },
           userId: {
                type: mongoose.Schema.Types.ObjectId,
                ref: "User",
-               required: true
-          }
+               required: true,
+          },
+          title: {
+               type: String,
+               default: "Saiba mais", // título padrão
+          },
+          description: {
+               type: String,
+               default: "Preencha seus dados para continuar",
+          },
+          bannerUrl: {
+               type: String,
+               default: "", // pode ficar vazio e usamos imagem padrão no frontend
+          },
      },
      { timestamps: true }
 );

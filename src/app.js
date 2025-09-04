@@ -8,9 +8,16 @@ import authRoutes from "./routes/authRoutes.js";
 import linkRoutes from "./routes/linkRoutes.js";
 import redirectRoutes from "./routes/redirectRoutes.js";
 import logger from "./utils/logger.js";
+import leadRoutes from "./routes/leadRoutes.js";
 
+import path from "path";
+import { fileURLToPath } from "url";
 // Swagger
 import { swaggerSpec, swaggerUi } from "./config/swagger.js";
+
+// no topo do arquivo
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -18,6 +25,19 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// Helmet com CSP (apenas uma vez)
+app.use(
+     helmet({
+          contentSecurityPolicy: {
+               directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'"],
+                    imgSrc: ["'self'", "https:", "data:"],
+               },
+          },
+     })
+);
 
 // Logs HTTP com morgan, redirecionados para winston
 app.use(
@@ -28,9 +48,13 @@ app.use(
      })
 );
 
+// Servir arquivos estáticos ANTES das rotas
+app.use("/static", express.static(path.join(__dirname, "public")));
+
 // Rotas principais
 app.use("/api/auth", authRoutes);
 app.use("/api/links", linkRoutes);
+app.use("/api/leads", leadRoutes); // <-- nova rota
 
 // Documentação Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
